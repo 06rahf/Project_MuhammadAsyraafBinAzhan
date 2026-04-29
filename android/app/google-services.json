@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "291098395702",
-    "firebase_url": "https://flutterauthapp-7a7b7-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "flutterauthapp-7a7b7",
-    "storage_bucket": "flutterauthapp-7a7b7.firebasestorage.app"
+    "project_number": "587050464426",
+    "firebase_url": "https://mobileapp-3851c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mobileapp-3851c",
+    "storage_bucket": "mobileapp-3851c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:291098395702:android:c065ce0f6e0aa009560497",
+        "mobilesdk_app_id": "1:587050464426:android:568530edf6dbd0f4d0ccd3",
         "android_client_info": {
           "package_name": "com.example.flutterauthapp"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAnXymGyPUFIPZO1o3Ki1r5RHc2Tr4fjmw"
+          "current_key": "AIzaSyCxTkcDgmltnzZh4fhz0B-eAuTeShmXhk0"
         }
       ],
       "services": {

@@ -10,100 +10,84 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
 
-  void _handleLogin() async {
-    setState(() => _isLoading = true);
+  String email = "";
+  String password = "";
+  bool isLoading = false;
+
+  void handleLogin() async {
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sila isi emel dan kata laluan')),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
     try {
-      await context.read<AppState>().login(
-            _emailController.text.trim(),
-            _passwordController.text.trim(),
-          );
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
+      await context.read<AppState>().login(email, password);
+      if (mounted) Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Failed: ${e.toString()}')),
+          const SnackBar(content: Text('Gagal: Emel atau Kata Laluan Salah')),
         );
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.teal.shade300, Colors.white],
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.wc, size: 100, color: Colors.teal),
-                const SizedBox(height: 20),
-                const Text(
-                  'Smart Toilet Login',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 40),
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: _isLoading 
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('LOGIN'),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/signup'),
-                  child: const Text('Create New Account'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/academic_integrity'),
-                  child: const Text('Academic Integrity Declaration'),
-                ),
-              ],
+      appBar: AppBar(title: const Text('Login'), backgroundColor: Colors.teal),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // Susun semua ke tengah
+          children: [
+            const Icon(Icons.lock_outline, size: 80, color: Colors.teal),
+            const SizedBox(height: 20),
+
+            // email
+            TextField(
+              onChanged: (val) => email = val,
+              decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
             ),
-          ),
+            const SizedBox(height: 10),
+
+            // Input Password
+            TextField(
+              onChanged: (val) => password = val,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 20),
+
+            // Butang Login
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                onPressed: isLoading ? null : handleLogin,
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('LOGIN', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+
+            // Link ke Signup & Integrity
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, '/signup'),
+              child: const Text('Daftar Akaun Baru'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, '/academic_integrity'),
+              child: const Text('Academic Integrity Compliance'),
+            ),
+          ],
         ),
       ),
     );

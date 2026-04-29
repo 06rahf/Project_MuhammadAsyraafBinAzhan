@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'main.dart';
 
 class HomePage extends StatelessWidget {
@@ -8,159 +9,124 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final user = FirebaseAuth.instance.currentUser;
+    final String email = user?.email ?? "User";
+
+    if (appState.gasDetected) {
+      Future.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("⚠️ AMARAN: Gas Bahaya Dikesan!"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Smart Toilet System'),
+        title: const Text("Dashboard"),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<AppState>().logout();
-              Navigator.pushReplacementNamed(context, '/login'); // TAMBAH INI
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.teal),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.wc, size: 64, color: Colors.white),
-                  SizedBox(height: 10),
-                  Text(
-                    'Toilet Management',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ],
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Colors.teal),
+              accountName: Text(email.split('@')[0].toUpperCase()),
+              accountEmail: Text(email),
+              currentAccountPicture: const CircleAvatar(
+                backgroundImage: AssetImage('assets/profile.jpg'),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.dashboard),
-              title: const Text('Monitoring Dashboard'),
+              title: const Text("Dashboard"),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: const Icon(Icons.verified_user),
-              title: const Text('Academic Integrity'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/academic_integrity');
-              },
+              leading: const Icon(Icons.info),
+              title: const Text("Academic Integrity"),
+              onTap: () => Navigator.pushNamed(context, '/academic_integrity'),
             ),
-            const Divider(),
+            const Spacer(),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text("Logout"),
               onTap: () {
                 context.read<AppState>().logout();
-                Navigator.pushReplacementNamed(context, '/login'); // TAMBAH INI JUGA
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(15.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatusHeader(appState),
-            const SizedBox(height: 24),
-
-            const Text(
-              'Live Sensor Readings',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                'assets/profile.jpg',
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 150,
+                    color: Colors.teal.shade100,
+                    child: const Icon(Icons.image_not_supported, size: 50, color: Colors.teal),
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+            const SizedBox(height: 20),
+
+            Row(
               children: [
-                _buildSensorCard(
-                  Icons.thermostat,
-                  'Temp',
-                  '${appState.temperature.toStringAsFixed(1)}°C',
-                  Colors.orange,
-                ),
-                _buildSensorCard(
-                  Icons.water_drop,
-                  'Humidity',
-                  '${appState.humidity.toStringAsFixed(1)}%',
-                  Colors.blue,
-                ),
-                _buildSensorCard(
-                  Icons.social_distance,
-                  'Distance',
-                  '${appState.distance.toStringAsFixed(1)} cm',
-                  Colors.purple,
-                ),
-                _buildSensorCard(
-                  Icons.timer,
-                  'Sit Time',
-                  '${appState.sitTime}s',
-                  Colors.grey,
-                ),
+                _sensorBox("Suhu", "${appState.temperature.toStringAsFixed(1)}°C", Colors.orange),
+                const SizedBox(width: 8),
+                _sensorBox("Humid", "${appState.humidity.toStringAsFixed(1)}%", Colors.blue),
+                const SizedBox(width: 8),
+                _sensorBox("Jarak", "${appState.distance.toStringAsFixed(1)}cm", Colors.purple),
               ],
             ),
+            const SizedBox(height: 20),
 
-            const SizedBox(height: 24),
-            const Text(
-              'Environmental Safety',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              color: appState.gasDetected ? Colors.red.shade50 : Colors.green.shade50,
-              child: ListTile(
-                leading: Icon(
-                  appState.gasDetected ? Icons.warning : Icons.check_circle,
-                  color: appState.gasDetected ? Colors.red : Colors.green,
-                ),
-                title: Text(
-                  appState.gasDetected ? 'GAS DETECTED!' : 'Air Quality: Clean',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: appState.gasDetected ? Colors.red : Colors.green,
-                  ),
-                ),
-                subtitle: const Text('Monitoring MQ135 Sensor'),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: appState.gasDetected ? Colors.red : Colors.green,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                appState.gasDetected ? "⚠️ GAS BAHAYA!" : "✅ GAS BERSIH",
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
 
-            const SizedBox(height: 24),
-            const Text(
-              'Actuators & Controls',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const SizedBox(height: 30),
+            const Text("Kawalan Peranti", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Divider(),
+
+            SwitchListTile(
+              title: const Text("Lampu LED (Pin 15)"),
+              secondary: Icon(Icons.lightbulb, color: appState.isLedOn ? Colors.amber : Colors.grey),
+              value: appState.isLedOn,
+              onChanged: (val) => appState.toggleLed(),
             ),
-            const SizedBox(height: 12),
-            _buildControlCard(
-              Icons.mode_fan_off_outlined,
-              'Ventilation Fan',
-              'Fan helps clear odor/gas',
-              appState.isFanOn,
-              (val) => appState.toggleFan(),
-              Colors.teal,
-            ),
-            const SizedBox(height: 10),
-            _buildControlCard(
-              Icons.door_front_door,
-              'Door Solenoid Lock',
-              'Control door accessibility',
-              appState.isLocked,
-              (val) => appState.toggleLock(),
-              Colors.redAccent,
+
+            SwitchListTile(
+              title: const Text("Buzzer (Pin 4)"),
+              secondary: Icon(Icons.campaign, color: appState.isBuzzerOn ? Colors.red : Colors.grey),
+              value: appState.isBuzzerOn,
+              onChanged: (val) => appState.toggleBuzzer(),
             ),
           ],
         ),
@@ -168,71 +134,21 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusHeader(AppState state) {
-    bool isOccupied = state.distance > 2 && state.distance < 200;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isOccupied ? Colors.redAccent : Colors.teal.shade700,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            isOccupied ? Icons.person : Icons.no_accounts,
-            color: Colors.white,
-            size: 48,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            isOccupied ? 'TOILET OCCUPIED' : 'TOILET EMPTY',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSensorCard(IconData icon, String label, String value, Color color) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+  Widget _sensorBox(String tajuk, String nilai, Color warna) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          color: warna.withOpacity(0.1),
+          border: Border.all(color: warna, width: 2),
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 30),
-            const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(nilai, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
+            Text(tajuk, style: const TextStyle(fontSize: 11, color: Colors.black54)),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlCard(IconData icon, String title, String sub, bool isOn, Function(bool) onChanged, Color activeColor) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: isOn ? activeColor : Colors.grey.shade200,
-          child: Icon(icon, color: isOn ? Colors.white : Colors.grey),
-        ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(sub),
-        trailing: Switch(
-          value: isOn,
-          onChanged: onChanged,
-          activeColor: activeColor,
         ),
       ),
     );

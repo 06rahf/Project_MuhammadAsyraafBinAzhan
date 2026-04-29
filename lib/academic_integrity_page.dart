@@ -8,97 +8,55 @@ class AcademicIntegrityPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Academic Integrity'),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.teal,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Icon(
-                Icons.verified_user_outlined,
-                size: 80,
-                color: Colors.blueAccent,
-              ),
-            ),
-            const SizedBox(height: 24),
+
             const Text(
-              'Academic Integrity Compliance Declaration',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
-              ),
+              'Student Declaration',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
-            const Divider(),
-            const SizedBox(height: 16),
-            _buildInstructionItem(
-              '1.',
-              'This assessment is the sole effort of the student submitting the work.',
+            const SizedBox(height: 10),
+
+
+            const Text(
+              'I, Muhammad Asyraaf bin Azhan, declare that this IoT project is my own work. I have not copied this project from any other sources illegally.',
+              style: TextStyle(fontSize: 16),
             ),
-            _buildInstructionItem(
-              '2.',
-              'Wholesale copying the code of an entire project or any major feature from ANY resource is NOT ALLOWED at all.',
+
+            const SizedBox(height: 20),
+            const Divider(), //
+            const SizedBox(height: 20),
+
+
+            const Text(
+              'References:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            _buildInstructionItem(
-              '3.',
-              'Any sharing of ideas or code will be considered a violation of academic integrity and will result in zero (0) mark for the assessment.',
-            ),
-            _buildInstructionItem(
-              '4.',
-              'Proper citation of reference(s), borrowed intellectual property and plagiarism declaration are made in this dedicated mobile app page.',
-            ),
-            _buildInstructionItem(
-              '5.',
-              'Students shall avoid from practicing any copyright infringement at all.',
-            ),
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Student Declaration:',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'I, Muhammad Asyraaf bin Azhan, hereby declare that this project is my own work and that I have not plagiarized any part of it.',
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                ],
+            const SizedBox(height: 10),
+
+
+            const Text('• Flutter Official Documentation (https://docs.flutter.dev)'),
+            const SizedBox(height: 5),
+            const Text('• Firebase Realtime Database (https://firebase.google.com)'),
+            const SizedBox(height: 5),
+            const Text('• Arduino ESP32 Library (https://github.com/mobizt/Firebase-ESP32)'),
+
+            const SizedBox(height: 30),
+
+
+            const Center(
+              child: Text(
+                '✅ Verified Student Submission',
+                style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInstructionItem(String number, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            number,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(text),
-          ),
-        ],
       ),
     );
   }
